@@ -75,7 +75,7 @@ if (letterIdx == currentSentence.length) {
         let endTime = Date.now();
         let totalMinutes = (endTime - startTime) / 1000 / 60;
         let wordsPerMinute = (numOfWords / totalMinutes )- (2 * mistakes);
-        $('#feedback').text('You scored ' + wordsPerMinute + ' words per minute');
+        $('#feedback').text('You scored ' + Math.floor(wordsPerMinute) + ' words per minute');
         setTimeout(function () {
             if (confirm('Would you like to play again?')) {
                 // reset game if confirm play again
