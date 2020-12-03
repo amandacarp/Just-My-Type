@@ -5,7 +5,13 @@ let letterIdx = 0;
 let currentSentence = sentences[sentenceIdx];
 let currentLetter = currentSentence[letterIdx];
 let mistakes = 0;
+let gameStarted = false;
+let startTime;
+let numOfWords = 0;
 
+for (let i=0; i < sentences.length; i++) {
+    numOfWords += sentences[i].split(' ').length;
+}
 
 //only have lowercase keyboard appear when page loads
 $('#keyboard-upper-container').hide();
@@ -24,9 +30,9 @@ $(document).keydown(function (event) {
 });
 
 $(document).keyup(function (e) {
-//remove highlight with keyup
+    //remove highlight with keyup
     $(".highlight").removeClass('highlight')
-//when shift is lifted -reverse
+    //when shift is lifted -reverse
     var whichKey = e.which
     if (whichKey == 16) {
         $('#keyboard-lower-container').show();
@@ -35,36 +41,42 @@ $(document).keyup(function (e) {
 });
 
 $(document).keypress(function (e) {
-//start game with first user keypress
-    let startTime = Date.now();
+    //start game with first user keypress
+    if (gameStarted === false){
+    gameStarted = true;
+    startTime = Date.now();
+}
 
 //when each button is pressed- highlight 
-    $("#" + e.which).addClass('highlight')
+$("#" + e.which).addClass('highlight')
 
 //if user keyboard input matches letter in sentence, show check mark
-    if (e.which == currentSentence.charCodeAt(letterIdx)) {
-        $('#feedback').append('<span class= "glyphicon glyphicon-ok"> </span> ')
-//and increment and change target letter on screen
-        letterIdx++;
-        currentLetter = currentSentence[letterIdx];
-        $('#target-letter').text(currentLetter);
-//if user input does not match letter in sentence, show X mark       
-    } else {
-        $('#feedback').append('<span class= "glyphicon glyphicon-remove"> </span> ')
-//count how many mistakes user makes
-        mistakes++
-    };
-//increment and change target sentence on screen
-    if (letterIdx == currentSentence.length) {
-        sentenceIdx++;
+if (e.which == currentSentence.charCodeAt(letterIdx)) {
+    $('#feedback').append('<span class= "glyphicon glyphicon-ok"> </span> ')
+    //and increment and change target letter on screen
+    letterIdx++;
+    currentLetter = currentSentence[letterIdx];
+    $('#target-letter').text(currentLetter);
 
-//end game if run out of sentences
-    if (sentenceIdx == sentences.length){
+    //move yellow block as correct keys are pressed
+    $('#yellow-block').css('margin-left', '+=17.5px');
+    //if user input does not match letter in sentence, show X mark       
+} else {
+    $('#feedback').append('<span class= "glyphicon glyphicon-remove"> </span> ')
+    //count how many mistakes user makes
+    mistakes++
+};
+//increment and change target sentence on screen
+if (letterIdx == currentSentence.length) {
+    sentenceIdx++;
+
+    //end game if run out of sentences
+    if (sentenceIdx == sentences.length) {
         let endTime = Date.now();
         let totalMinutes = (endTime - startTime) / 1000 / 60;
-        let numOfWords = 54 / totalMinutes - 2 * mistakes;
-        $('#feedback').text('You scored ' + numOfWords + ' words per minute');
-        setTimeout(function() {
+        let wordsPerMinute = (numOfWords / totalMinutes )- (2 * mistakes);
+        $('#feedback').text('You scored ' + wordsPerMinute + ' words per minute');
+        setTimeout(function () {
             if (confirm('Would you like to play again?')) {
                 // reset game if confirm play again
                 sentenceIdx = 0;
@@ -77,20 +89,19 @@ $(document).keypress(function (e) {
                 $('#yellow-block').css('margin-left', '0px');
             }
         }, 2000);
-//if you have more sentences show next sent in array
-        } else {
+        //if you have more sentences show next sent in array
+    } else {
         currentSentence = sentences[sentenceIdx];
         $('#sentence').text(currentSentence);
-//remove all check marks or x's on page
+        //remove all check marks or x's on page
         $('#feedback').empty()
-//return yellow block to beginning of sentence
+        //return yellow block to beginning of sentence
         $('#yellow-block').css('margin-left', '0px')
-//display first letter of new sentence
+        //display first letter of new sentence
         letterIdx = 0;
         currentLetter = currentSentence.charAt(letterIdx);
         $('#target-letter').text(currentLetter);
     }
-    };
-//move yellow block as keys are pressed
-    $('#yellow-block').css('margin-left', '+=17.5px');
+};
+
 });
